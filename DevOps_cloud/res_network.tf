@@ -1,9 +1,9 @@
 # network.tf
   
 # vpc 생성
-# resource "nhncloud_networking_vpc_v2" "kips-vpc" {
-#   name = "kips-vpc"
-#   cidrv4 = "10.0.0.0/16"
+# resource "nhncloud_networking_vpc_v2" "devops-vpc" {
+#   name = "devops-vpc"
+#   cidrv4 = "192.168.0.0/16"
 # }
 
 # routing table 생성
@@ -11,14 +11,13 @@ resource "nhncloud_networking_routingtable_v2" "devops-vpc-rt" {
   name = "devops-vpc-rt"
   vpc_id = data.nhncloud_networking_vpc_v2.default-vpc.id
   distributed = true
-  #internet_gw_id = var.web-ig
 }
 
 # subnet 생성
-resource "nhncloud_networking_vpcsubnet_v2" "debops-subnet" {
+resource "nhncloud_networking_vpcsubnet_v2" "devops-subnet" {
   name      = "devops-subnet"
   vpc_id    = data.nhncloud_networking_vpc_v2.default-vpc.id
-  cidr      = "10.0.1.0/24"
+  cidr      = "192.168.1.0/24"
   routingtable_id = nhncloud_networking_routingtable_v2.devops-vpc-rt.id
 }
 
