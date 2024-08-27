@@ -14,4 +14,3 @@ data "nhncloud_images_image_v2" "ubuntu" {
   name = var.image_desc
   most_recent = true
 }
-
