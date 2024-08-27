@@ -5,9 +5,9 @@ resource "nhncloud_networking_port_v2" "web-nic" {
   name = "web_port_1"
   network_id = nhncloud_networking_vpc_v2.kips-vpc.id
   admin_state_up = "true"
-  # fixed_ip {
-  #   subnet_id = data.nhncloud_networking_vpcsubnet_v2.web-subnet.id
-  # }
+  fixed_ip {
+    subnet_id = nhncloud_networking_vpcsubnet_v2.web-subnet.id
+  }
   security_group_ids = [nhncloud_networking_secgroup_v2.web-sg.id]
 }
 
@@ -41,6 +41,9 @@ resource "nhncloud_networking_port_v2" "was-nic" {
   name = "was_port_1"
   network_id = nhncloud_networking_vpc_v2.kips-vpc.id
   admin_state_up = "true"
+  fixed_ip {
+    subnet_id = nhncloud_networking_vpcsubnet_v2.was-subnet.id
+  }
   security_group_ids = [nhncloud_networking_secgroup_v2.was-sg.id]
 }
 
