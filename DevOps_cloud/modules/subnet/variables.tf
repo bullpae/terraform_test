@@ -16,5 +16,4 @@ variable "subnet_name" {
 variable "subnet_cidr_block" {
   type        = string
   description = "VPC Subnet CIDR Block"
-  default     = "10.0.10.0/24"
 }
