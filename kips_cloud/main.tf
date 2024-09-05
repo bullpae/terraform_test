@@ -2,9 +2,9 @@
 
 module "vpc" {
   source         = "./modules/vpc"
-  vpc_name       = "devops-vpc"
-  vpc_cidr_block = "10.0.0.0/16"
-  vpc_rt_name    = "devops-vpc-rt"
+  vpc_name       = var.vpc_name
+  vpc_cidr_block = var.vpc_cidr_block
+  vpc_rt_name    = var.vpc_rt_name
 }
 
 module "subnet" {
@@ -48,9 +48,22 @@ module "instance" {
   # Instance VM
   instance_name = var.instances[count.index].instance_name
   key_pair      = var.instances[count.index].key_pair
-  flavor_id     = data.nhncloud_compute_flavor_v2.devops_flavor.id
-  image_id      = data.nhncloud_images_image_v2.linux.id
-  block_device  = var.instances[count.index].block_device
+
+  #flavor_id     = data.nhncloud_compute_flavor_v2.flavor.id
+  flavor_id = (
+    var.instances[count.index].flavor_id == "bastion" ? data.nhncloud_compute_flavor_v2.bastion_flavor.id :
+    var.instances[count.index].flavor_id == "web" ? data.nhncloud_compute_flavor_v2.web_flavor.id :
+    var.instances[count.index].flavor_id == "was" ? data.nhncloud_compute_flavor_v2.was_flavor.id :
+    var.instances[count.index].flavor_id == "db" ? data.nhncloud_compute_flavor_v2.db_flavor.id :
+    null
+  )
+  #image_id      = data.nhncloud_images_image_v2.linux.id
+  image_id = (
+    var.instances[count.index].block_device.image_id == "os" ? data.nhncloud_images_image_v2.linux.id :
+    var.instances[count.index].block_device.flavor_id == "db" ? data.nhncloud_images_image_v2.linux_db.id :
+    null
+  )
+  block_device = var.instances[count.index].block_device
 }
 
 

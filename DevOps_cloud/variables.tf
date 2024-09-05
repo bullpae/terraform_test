@@ -90,23 +90,6 @@ variable "sg_sg_rules" {
 
 }
 
-data "nhncloud_compute_flavor_v2" "devops_flavor" {
-  name = "m2.c4m8"
-}
-
-# locals {
-#   devops_flavor_id = data.nhncloud_compute_flavor_v2.devops_flavor.id
-# }
-
-data "nhncloud_images_image_v2" "linux" {
-  name        = "Rocky Linux 8.10 (2024.08.20)"
-  most_recent = true
-}
-
-# locals {
-#   linux_image_id = data.nhncloud_images_image_v2.linux.id
-# }
-
 variable "instances" {
   description = "instance information"
   type = list(object({
