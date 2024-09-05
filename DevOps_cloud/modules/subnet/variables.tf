@@ -15,5 +15,5 @@ variable "subnet_name" {
 
 variable "subnet_cidr_block" {
   type        = string
-  description = "VPC Subnet CIDR Block"
+  description = "VPC Subnet CIDR Block (0.0.0.0/0)"
 }

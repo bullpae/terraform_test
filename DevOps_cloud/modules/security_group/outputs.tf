@@ -1,5 +1,5 @@
 
-# output "subnet_id" {
-#   value = nhncloud_networking_vpcsubnet_v2.subnet.id
-# }
+output "sg_id" {
+  value = nhncloud_networking_secgroup_v2.sg.id
+}
 
