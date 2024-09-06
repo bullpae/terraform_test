@@ -1,27 +1,43 @@
 # VPC -> Subnet -> Security Group -> Network Interface -> Instance VM
 
 module "vpc" {
-  source         = "./modules/vpc"
-  vpc_name       = var.vpc_name
-  vpc_cidr_block = var.vpc_cidr_block
-  vpc_rt_name    = var.vpc_rt_name
+  source = "./modules/vpc"
+  count  = length(var.vpc_info)
+
+  vpc_name       = var.vpc_info[count.index].vpc_name
+  vpc_cidr_block = var.vpc_info[count.index].vpc_cidr_block
+  vpc_rt_names   = var.vpc_info[count.index].vpc_rt_names
+  # vpc_cidr_block = var.vpc_cidr_block
+  # vpc_rt_name    = var.vpc_rt_name
 }
 
 module "subnet" {
   source = "./modules/subnet"
   count  = length(var.subnet_zones)
 
-  subnet_name       = "${var.subnet_zones[count.index]}-subnet"
-  vpc_id            = module.vpc.vpc_id
-  vpc_rt_id         = module.vpc.vpc_rt_id
-  subnet_cidr_block = "10.0.${(count.index + 1) * 10}.0/24"
+  subnet_name = "${var.subnet_zones[count.index].subnet_name}"
+  #vpc_id            = module.vpc.vpc_id
+  #vpc_rt_id         = module.vpc.vpc_rt_id
+
+  #vpc_index = var.subnet_zones[count.index].vpc_index
+  vpc_id = module.vpc[var.subnet_zones[count.index].vpc_index].vpc_id
+  # subnet type에 따라 routing table 적용(public=0, private=1)
+  vpc_rt_id = (
+    var.subnet_zones[count.index].subnet_type == "public" ? module.vpc[var.subnet_zones[count.index].vpc_index].vpc_rts[0].id :
+    module.vpc[var.subnet_zones[count.index].vpc_index].vpc_rts[1].id
+  )
+
+  # Multi VPC 일 경우 2번째 byte로 구분 (Index + 1)
+  # Multi Subnet일 경우 3번째 byte로 구분 (Index + 1) * 10
+  subnet_cidr_block = "10.${var.subnet_zones[count.index].vpc_index + 1}.${(count.index + 1) * 10}.0/24"
 }
 
 module "security_group" {
   source = "./modules/security_group"
   count  = length(var.sg_sg_rules)
 
-  sg_name  = var.sg_sg_rules[count.index].sg_name
+  sg_name = var.sg_sg_rules[count.index].sg_name
+  #var.sg_sg_rules[count.index].cidr_blocks = "10.0.${(count.index + 1) * 10}.0/24"
   sg_rules = var.sg_sg_rules[count.index].sg_rules # list type
 }
 
@@ -39,7 +55,8 @@ module "instance" {
   count  = length(var.instances)
 
   # Network Interface
-  vpc_id = module.vpc.vpc_id
+  vpc_id = module.vpc[0].vpc_id
+  #vpc_id = module.vpc.vpc_id
   # nic_id    = module.network.nic_id
   subnet_id = module.subnet[var.instances[count.index].subnet_index].subnet_id
   sg_id     = module.security_group[var.instances[count.index].sg_index].sg_id
@@ -59,8 +76,8 @@ module "instance" {
   )
   #image_id      = data.nhncloud_images_image_v2.linux.id
   image_id = (
-    var.instances[count.index].block_device.image_id == "os" ? data.nhncloud_images_image_v2.linux.id :
-    var.instances[count.index].block_device.flavor_id == "db" ? data.nhncloud_images_image_v2.linux_db.id :
+    var.instances[count.index].block_device.image_id == "linux" ? data.nhncloud_images_image_v2.linux.id :
+    var.instances[count.index].block_device.image_id == "mariadb" ? data.nhncloud_images_image_v2.linux_db.id :
     null
   )
   block_device = var.instances[count.index].block_device

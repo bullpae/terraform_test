@@ -1,22 +1,59 @@
-variable "vpc_name" {
-  type    = string
-  default = "kips-vpc"
+variable "vpc_info" {
+  type = list(object({
+    vpc_name       = string
+    vpc_cidr_block = string
+    vpc_rt_names   = list(string)
+  }))
+
+  default = [{ vpc_name = "kips-vpc"
+    vpc_cidr_block = "10.1.0.0/16"
+    vpc_rt_names   = ["public-kips-vpc-rt", "private-kips-vpc-rt"]
+  }]
 }
 
-variable "vpc_cidr_block" {
-  type    = string
-  default = "10.0.0.0/16"
-}
+# variable "vpc_cidr_block" {
+#   type    = list(string)
+#   default = ["10.1.0.0/16"]
+# }
 
-variable "vpc_rt_name" {
-  type    = string
-  default = "kips-vpc-rt"
-}
+# variable "vpc_rt_name" {
+#   type    = list(string)
+#   default = ["public-kips-vpc-rt", "private-kips-vpc-rt"]
+# }
 
 variable "subnet_zones" {
-  type    = list(string)
-  default = ["web", "test", "dev"]
+  type = list(object({
+    subnet_name = string
+    vpc_index   = number
+    subnet_type = string
+  }))
+  default = [{
+    subnet_name = "web-subnet"              # 10.1.10.0/24
+    vpc_index   = 0
+    subnet_type = "public"
+    }, {
+    subnet_name = "was-subnet"              # 10.1.20.0/24
+    vpc_index   = 0
+    subnet_type = "private"
+    }, {
+    subnet_name = "db-subnet"               # 10.1.30.0/24
+    vpc_index   = 0
+    subnet_type = "private"
+    }, {
+    subnet_name = "test-subnet"             # 10.1.40.0/24
+    vpc_index   = 0
+    subnet_type = "private"
+    }, {
+    subnet_name = "dev-subnet"              # 10.1.50.0/24
+    vpc_index   = 0
+    subnet_type = "private"
+  }]
+  #default = ["web", "test", "dev"]
 }
+
+# variable "vpc_index" {
+#   type = number
+# }
 
 variable "sg_sg_rules" {
   description = "Security Group & Security Group Rules"
@@ -51,23 +88,23 @@ variable "sg_sg_rules" {
         description = "ssh"
         ethertype   = "IPv4"
         direction   = "ingress"
-        from_port   = "22"
-        to_port     = "22"
+        from_port   = "22"          # 보안을 위해 Port 변경 필요!
+        to_port     = "22"          # 보안을 위해 Port 변경 필요!
         protocol    = "tcp"
         cidr_blocks = "0.0.0.0/0"
     }]
     },
     {
-      sg_name = "test-sg"
+      sg_name = "was-sg"
       sg_rules = [{
-        name        = "http"
-        description = "http"
+        name        = "tomcat"
+        description = "tomcat"
         ethertype   = "IPv4"
         direction   = "ingress"
-        from_port   = "80"
-        to_port     = "80"
+        from_port   = "8080"
+        to_port     = "8080"
         protocol    = "tcp"
-        cidr_blocks = "0.0.0.0/0"
+        cidr_blocks = "10.1.10.0/24" # web-subnet 허용
         },
         {
           name        = "ssh"
@@ -77,7 +114,63 @@ variable "sg_sg_rules" {
           from_port   = "22"
           to_port     = "22"
           protocol    = "tcp"
-          cidr_blocks = "0.0.0.0/0"
+          cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
+      }]
+    },
+        {
+      sg_name = "db-sg"
+      sg_rules = [{
+        name        = "mariadb"
+        description = "mariadb"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "3306"
+        to_port     = "3306"
+        protocol    = "tcp"
+        cidr_blocks = "10.1.20.0/24" # was-subnet 허용 
+        },
+        {
+          name        = "ssh"
+          description = "ssh"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
+      }]
+    },
+    {
+      sg_name = "test-sg"
+      sg_rules = [{
+        name        = "tomcat"
+        description = "tomcat"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "8080"
+        to_port     = "8080"
+        protocol    = "tcp"
+        cidr_blocks = "10.1.10.0/24" # web-subnet 허용
+        },
+        {
+        name        = "mariadb"
+        description = "mariadb"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "3306"
+        to_port     = "3306"
+        protocol    = "tcp"
+        cidr_blocks = "10.1.40.0/24" # test-subnet 허용
+        },
+        {
+          name        = "ssh"
+          description = "ssh"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
       }]
     },
     {
@@ -90,7 +183,27 @@ variable "sg_sg_rules" {
         from_port   = "80"
         to_port     = "80"
         protocol    = "tcp"
-        cidr_blocks = "0.0.0.0/0"
+        cidr_blocks = "10.1.10.0/24" # web-subnet 허용
+        },
+        {
+        name        = "tomcat"
+        description = "tomcat"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "80"
+        to_port     = "80"
+        protocol    = "tcp"
+        cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
+        },
+        {
+        name        = "mariadb"
+        description = "mariadb"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "3306"
+        to_port     = "3306"
+        protocol    = "tcp"
+        cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
         },
         {
           name        = "ssh"
@@ -100,7 +213,7 @@ variable "sg_sg_rules" {
           from_port   = "22"
           to_port     = "22"
           protocol    = "tcp"
-          cidr_blocks = "0.0.0.0/0"
+          cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
       }]
   }]
 }
@@ -110,8 +223,8 @@ variable "instances" {
   type = list(object({
     instance_name = string
     nic_name      = string
-    subnet_index  = number # web=0, test=1, dev=2 ## was 추가 시 index 주의!!
-    sg_index      = number # web-sg=0, test-sg=1, dev-sg=2
+    subnet_index  = number # web=0, was=1, db=2, test=3, dev=4 ## was 추가 시 index 주의!!
+    sg_index      = number # web-sg=0, was-sg=1, db-sg=2, test-sg=3, dev-sg=4
     key_pair      = string
     flavor_id     = string
     block_device = object({
@@ -132,7 +245,7 @@ variable "instances" {
     key_pair      = "kips_key"
     flavor_id     = "bastion"
     block_device = {
-      image_id              = "os"
+      image_id              = "linux"
       source_type           = "image"
       destination_type      = "volume"
       boot_index            = 0
@@ -147,7 +260,7 @@ variable "instances" {
       key_pair      = "kips_key"
       flavor_id     = "web"
       block_device = {
-        image_id              = "os"
+        image_id              = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
@@ -157,12 +270,12 @@ variable "instances" {
     {
       instance_name = "analysis_test_was_vm"
       nic_name      = "analysis_test_was_nic"
-      subnet_index  = 1
-      sg_index      = 1
+      subnet_index  = 3
+      sg_index      = 3
       key_pair      = "kips_key"
       flavor_id     = "was"
       block_device = {
-        image_id              = "os"
+        image_id              = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
@@ -172,12 +285,12 @@ variable "instances" {
     {
       instance_name = "analysis_test_db_vm"
       nic_name      = "analysis_test_db_nic"
-      subnet_index  = 1
-      sg_index      = 1
+      subnet_index  = 3
+      sg_index      = 3
       key_pair      = "kips_key"
       flavor_id     = "db"
       block_device = {
-        image_id              = "os"
+        image_id              = "mariadb"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
@@ -187,12 +300,12 @@ variable "instances" {
     {
       instance_name = "analysis_dev_was_vm"
       nic_name      = "analysis_dev_was_nic"
-      subnet_index  = 2
-      sg_index      = 2
+      subnet_index  = 4
+      sg_index      = 4
       key_pair      = "kips_key"
       flavor_id     = "was"
       block_device = {
-        image_id              = "os"
+        image_id              = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
@@ -202,12 +315,12 @@ variable "instances" {
     {
       instance_name = "map_dev_db_vm"
       nic_name      = "map_dev_db_nic"
-      subnet_index  = 2
-      sg_index      = 2
+      subnet_index  = 4
+      sg_index      = 4
       key_pair      = "kips_key"
       flavor_id     = "db"
       block_device = {
-        image_id              = "os"
+        image_id              = "mariadb"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0

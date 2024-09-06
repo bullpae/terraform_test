@@ -10,7 +10,7 @@
 ## Compute Optimized
 ### c2.c2m2 : vCPU 2, Memory 2GB
 ## Memory Optimized
-### r2.c16m64 : vCPU 16, Memory 64GB
+### r2.c8m64 : vCPU 8, Memory 64GB
 ## Performance Optimized
 ### x1.c16m128 : vCPU 16, Memory 128GB
 data "nhncloud_compute_flavor_v2" "bastion_flavor" {
@@ -26,7 +26,7 @@ data "nhncloud_compute_flavor_v2" "was_flavor" {
 }
 
 data "nhncloud_compute_flavor_v2" "db_flavor" {
-  name = "r2.c16m64"
+  name = "r2.c8m64"
 }
 
 variable "flavor" {
@@ -62,5 +62,5 @@ data "nhncloud_images_image_v2" "linux_db" {
 variable "image" {
   description = "vm image"
   type        = list(string)
-  default     = ["os", "db"]
+  default     = ["linux", "mariadb"]
 }

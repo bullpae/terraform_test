@@ -4,16 +4,16 @@
 # }
 
 variable "vpc_name" {
-  type        = string
   description = "VPC Name"
+  type        = string
 }
 
 variable "vpc_cidr_block" {
-  type        = string
   description = "VPC CIDR Block"
+  type        = string
 }
 
-variable "vpc_rt_name" {
-  type        = string
-  description = "VPC Routing Table Name"
+variable "vpc_rt_names" {
+  description = "VPC Routing Table Names"
+  type        = list(string)
 }

@@ -6,7 +6,9 @@ resource "nhncloud_networking_vpc_v2" "vpc" {
 
 # routing table 생성
 resource "nhncloud_networking_routingtable_v2" "vpc_rt" {
-  name = var.vpc_rt_name  # 입력 받을 변수
+  count = length(var.vpc_rt_names)
+  
+  name = var.vpc_rt_names[count.index]  # 입력 받을 변수
   vpc_id = nhncloud_networking_vpc_v2.vpc.id
   distributed = true
 }
