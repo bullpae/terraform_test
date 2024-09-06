@@ -84,10 +84,14 @@ module "instance" {
 }
 
 
-# # 공인 IP 할당 (internet gateway 가 연결된 VPC에만 할당 가능!! 현재는 VPC Default Network만 자동 가능!!)
-# resource "nhncloud_networking_floatingip_v2" "fip" {
-#     pool = "Public Network"
-# }
+# 공인 IP 할당 (internet gateway 가 연결된 VPC에만 할당 가능!! 현재는 VPC Default Network만 자동 가능!!)
+resource "nhncloud_networking_floatingip_v2" "web_fip" {
+    pool = "Public Network"
+}
+
+resource "nhncloud_networking_floatingip_v2" "bastion_fip" {
+    pool = "Public Network"
+}
 
 # # 공인 IP 할당
 # resource "nhncloud_networking_floatingip_associate_v2" "devops-fip_associate" {
