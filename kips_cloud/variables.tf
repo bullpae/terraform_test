@@ -5,9 +5,9 @@ variable "vpc_info" {
     vpc_rt_names   = list(string)
   }))
 
-  default = [{ vpc_name = "kips-vpc"
+  default = [{ vpc_name = "koiia-vpc"
     vpc_cidr_block = "10.1.0.0/16"
-    vpc_rt_names   = ["public-kips-vpc-rt", "private-kips-vpc-rt"]
+    vpc_rt_names   = ["public-koiia-vpc-rt", "private-koiia-vpc-rt"]
   }]
 }
 
@@ -18,7 +18,7 @@ variable "vpc_info" {
 
 # variable "vpc_rt_name" {
 #   type    = list(string)
-#   default = ["public-kips-vpc-rt", "private-kips-vpc-rt"]
+#   default = ["public-koiia-vpc-rt", "private-koiia-vpc-rt"]
 # }
 
 variable "subnet_zones" {
@@ -242,7 +242,7 @@ variable "instances" {
     nic_name      = "bastion_nic"
     subnet_index  = 0
     sg_index      = 0
-    key_pair      = "kips_key"
+    key_pair      = "koiia_msp_key"
     flavor_id     = "bastion"
     block_device = [{
       image_type            = "linux"
@@ -265,7 +265,7 @@ variable "instances" {
       nic_name      = "analysis_test_web_nic"
       subnet_index  = 0
       sg_index      = 0
-      key_pair      = "kips_key"
+      key_pair      = "koiia_msp_key"
       flavor_id     = "web"
       block_device = [{
         image_type            = "linux"
@@ -288,7 +288,7 @@ variable "instances" {
       nic_name      = "analysis_test_was_nic"
       subnet_index  = 3
       sg_index      = 3
-      key_pair      = "kips_key"
+      key_pair      = "koiia_msp_key"
       flavor_id     = "was"
       block_device = [{
         image_type            = "linux"
@@ -311,7 +311,7 @@ variable "instances" {
       nic_name      = "analysis_test_db_nic"
       subnet_index  = 3
       sg_index      = 3
-      key_pair      = "kips_key"
+      key_pair      = "koiia_msp_key"
       flavor_id     = "db"
       block_device = [{
         image_type            = "mariadb"
@@ -334,7 +334,7 @@ variable "instances" {
       nic_name      = "analysis_dev_was_nic"
       subnet_index  = 4
       sg_index      = 4
-      key_pair      = "kips_key"
+      key_pair      = "koiia_msp_key"
       flavor_id     = "was"
       block_device = [{
         image_type            = "linux"
@@ -357,7 +357,7 @@ variable "instances" {
       nic_name      = "map_dev_db_nic"
       subnet_index  = 4
       sg_index      = 4
-      key_pair      = "kips_key"
+      key_pair      = "koiia_msp_key"
       flavor_id     = "db"
       block_device = [{
         image_type            = "mariadb"
