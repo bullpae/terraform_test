@@ -15,7 +15,7 @@ module "subnet" {
   source = "./modules/subnet"
   count  = length(var.subnet_zones)
 
-  subnet_name = "${var.subnet_zones[count.index].subnet_name}"
+  subnet_name = var.subnet_zones[count.index].subnet_name
   #vpc_id            = module.vpc.vpc_id
   #vpc_rt_id         = module.vpc.vpc_rt_id
 
@@ -74,23 +74,54 @@ module "instance" {
     var.instances[count.index].flavor_id == "db" ? data.nhncloud_compute_flavor_v2.db_flavor.id :
     null
   )
+
   #image_id      = data.nhncloud_images_image_v2.linux.id
-  image_id = (
-    var.instances[count.index].block_device.image_id == "linux" ? data.nhncloud_images_image_v2.linux.id :
-    var.instances[count.index].block_device.image_id == "mariadb" ? data.nhncloud_images_image_v2.linux_db.id :
-    null
-  )
+
+
+  # image_id = (
+  #   var.instances[count.index].block_device.image_id == "linux" ? data.nhncloud_images_image_v2.linux.id :
+  #   var.instances[count.index].block_device.image_id == "mariadb" ? data.nhncloud_images_image_v2.linux_db.id :
+  #   var.instances[count.index].block_device.image_id == "" ? "" :
+  #   null
+  # )
   block_device = var.instances[count.index].block_device
 }
+
+# module "block_storage" {
+#   source = "./modules/block_storage"
+#   count  = length(var.instances)
+
+#   instance_id = module.instance[count.index].instance_id
+
+#   volume_size = (module.instance[count.index].instance_name == "bastion_vm" ? 50 : 
+#     module.instance[count.index].instance_name == "analysis_test_web_vm" ? 100 : 
+#     module.instance[count.index].instance_name == "analysis_test_was_vm" ? 500 : 
+#     module.instance[count.index].instance_name == "analysis_test_db_vm" ? 500 :
+#     module.instance[count.index].instance_name == "analysis_dev_was_vm" ? 500 :
+#     module.instance[count.index].instance_name == "map_dev_db_vm" ? 500 :
+#     50)
+
+#   volume_name = (module.instance[count.index].instance_name == "bastion_vm" ? "bastion_vol" : 
+#     module.instance[count.index].instance_name == "analysis_test_web_vm" ? "analysis_test_web_vol" : 
+#     module.instance[count.index].instance_name == "analysis_test_was_vm" ? "analysis_test_was_vol" : 
+#     module.instance[count.index].instance_name == "analysis_test_db_vm" ? "analysis_test_db_vol" :
+#     module.instance[count.index].instance_name == "analysis_dev_was_vm" ? "analysis_dev_was_vol" :
+#     module.instance[count.index].instance_name == "map_dev_db_vm" ? "map_dev_db_vol" :
+#     "default_vol")
+
+#   # Zone A, B OS 설치 Zone과 같아야 함 그래서 instance 만들때 같이 만들어야 함!!! ㅠㅠ
+#   availability_zone = count.index % 2 == 0 ? "kr-pub-a" : "kr-pub-b"
+#   volume_type = "General HDD"
+# }
 
 
 # 공인 IP 할당 (internet gateway 가 연결된 VPC에만 할당 가능!! 현재는 VPC Default Network만 자동 가능!!)
 resource "nhncloud_networking_floatingip_v2" "web_fip" {
-    pool = "Public Network"
+  pool = "Public Network"
 }
 
 resource "nhncloud_networking_floatingip_v2" "bastion_fip" {
-    pool = "Public Network"
+  pool = "Public Network"
 }
 
 # # 공인 IP 할당

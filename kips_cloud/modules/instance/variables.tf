@@ -38,20 +38,20 @@ variable "flavor_id" {
   type        = string
 }
 
-variable "image_id" {
-  description = "Instance Image ID"
-  type        = string
-}
+# variable "image_id" {
+#   description = "Instance Image ID"
+#   type        = string
+# }
 
 variable "block_device" {
   description = "Network Interface ID"
-  type        = object({
-        #uuid                  = string 
+  type        = list(object({
+        image_type            = string 
         source_type           = string # image or blank
         destination_type      = string # local or volume
         boot_index            = number # 0(root), etc(additional disk)
         volume_size           = number # GB
         delete_on_termination = bool # instance 삭제시 함께 삭제 유무
-  })
+  }))
 }
  

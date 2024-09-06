@@ -28,23 +28,23 @@ variable "subnet_zones" {
     subnet_type = string
   }))
   default = [{
-    subnet_name = "web-subnet"              # 10.1.10.0/24
+    subnet_name = "web-subnet" # 10.1.10.0/24
     vpc_index   = 0
     subnet_type = "public"
     }, {
-    subnet_name = "was-subnet"              # 10.1.20.0/24
+    subnet_name = "was-subnet" # 10.1.20.0/24
     vpc_index   = 0
     subnet_type = "private"
     }, {
-    subnet_name = "db-subnet"               # 10.1.30.0/24
+    subnet_name = "db-subnet" # 10.1.30.0/24
     vpc_index   = 0
     subnet_type = "private"
     }, {
-    subnet_name = "test-subnet"             # 10.1.40.0/24
+    subnet_name = "test-subnet" # 10.1.40.0/24
     vpc_index   = 0
     subnet_type = "private"
     }, {
-    subnet_name = "dev-subnet"              # 10.1.50.0/24
+    subnet_name = "dev-subnet" # 10.1.50.0/24
     vpc_index   = 0
     subnet_type = "private"
   }]
@@ -88,8 +88,8 @@ variable "sg_sg_rules" {
         description = "ssh"
         ethertype   = "IPv4"
         direction   = "ingress"
-        from_port   = "22"          # 보안을 위해 Port 변경 필요!
-        to_port     = "22"          # 보안을 위해 Port 변경 필요!
+        from_port   = "22" # 보안을 위해 Port 변경 필요!
+        to_port     = "22" # 보안을 위해 Port 변경 필요!
         protocol    = "tcp"
         cidr_blocks = "0.0.0.0/0"
     }]
@@ -117,7 +117,7 @@ variable "sg_sg_rules" {
           cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
       }]
     },
-        {
+    {
       sg_name = "db-sg"
       sg_rules = [{
         name        = "mariadb"
@@ -153,14 +153,14 @@ variable "sg_sg_rules" {
         cidr_blocks = "10.1.10.0/24" # web-subnet 허용
         },
         {
-        name        = "mariadb"
-        description = "mariadb"
-        ethertype   = "IPv4"
-        direction   = "ingress"
-        from_port   = "3306"
-        to_port     = "3306"
-        protocol    = "tcp"
-        cidr_blocks = "10.1.40.0/24" # test-subnet 허용
+          name        = "mariadb"
+          description = "mariadb"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "3306"
+          to_port     = "3306"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.40.0/24" # test-subnet 허용
         },
         {
           name        = "ssh"
@@ -186,24 +186,24 @@ variable "sg_sg_rules" {
         cidr_blocks = "10.1.10.0/24" # web-subnet 허용
         },
         {
-        name        = "tomcat"
-        description = "tomcat"
-        ethertype   = "IPv4"
-        direction   = "ingress"
-        from_port   = "80"
-        to_port     = "80"
-        protocol    = "tcp"
-        cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
+          name        = "tomcat"
+          description = "tomcat"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "80"
+          to_port     = "80"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
         },
         {
-        name        = "mariadb"
-        description = "mariadb"
-        ethertype   = "IPv4"
-        direction   = "ingress"
-        from_port   = "3306"
-        to_port     = "3306"
-        protocol    = "tcp"
-        cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
+          name        = "mariadb"
+          description = "mariadb"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "3306"
+          to_port     = "3306"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.50.0/24" # dev-subnet 허용
         },
         {
           name        = "ssh"
@@ -227,14 +227,14 @@ variable "instances" {
     sg_index      = number # web-sg=0, was-sg=1, db-sg=2, test-sg=3, dev-sg=4
     key_pair      = string
     flavor_id     = string
-    block_device = object({
-      image_id              = string
+    block_device = list(object({
+      image_type            = string
       source_type           = string
       destination_type      = string
       boot_index            = number
       volume_size           = number
       delete_on_termination = bool
-    })
+    }))
   }))
 
   default = [{
@@ -244,14 +244,22 @@ variable "instances" {
     sg_index      = 0
     key_pair      = "kips_key"
     flavor_id     = "bastion"
-    block_device = {
-      image_id              = "linux"
+    block_device = [{
+      image_type            = "linux"
       source_type           = "image"
       destination_type      = "volume"
       boot_index            = 0
       volume_size           = 50
       delete_on_termination = true
-    } },
+      },
+      {
+        image_type            = ""
+        source_type           = "blank"
+        destination_type      = "volume"
+        boot_index            = 1
+        volume_size           = 50
+        delete_on_termination = true
+    }] },
     {
       instance_name = "analysis_test_web_vm"
       nic_name      = "analysis_test_web_nic"
@@ -259,14 +267,22 @@ variable "instances" {
       sg_index      = 0
       key_pair      = "kips_key"
       flavor_id     = "web"
-      block_device = {
-        image_id              = "linux"
+      block_device = [{
+        image_type            = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
         volume_size           = 50
         delete_on_termination = true
-    } },
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 100
+          delete_on_termination = true
+    }] },
     {
       instance_name = "analysis_test_was_vm"
       nic_name      = "analysis_test_was_nic"
@@ -274,14 +290,22 @@ variable "instances" {
       sg_index      = 3
       key_pair      = "kips_key"
       flavor_id     = "was"
-      block_device = {
-        image_id              = "linux"
+      block_device = [{
+        image_type            = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
         volume_size           = 50
         delete_on_termination = true
-    } },
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 500
+          delete_on_termination = true
+    }] },
     {
       instance_name = "analysis_test_db_vm"
       nic_name      = "analysis_test_db_nic"
@@ -289,14 +313,22 @@ variable "instances" {
       sg_index      = 3
       key_pair      = "kips_key"
       flavor_id     = "db"
-      block_device = {
-        image_id              = "mariadb"
+      block_device = [{
+        image_type            = "mariadb"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
         volume_size           = 50
         delete_on_termination = true
-    } },
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 500
+          delete_on_termination = true
+    }] },
     {
       instance_name = "analysis_dev_was_vm"
       nic_name      = "analysis_dev_was_nic"
@@ -304,14 +336,22 @@ variable "instances" {
       sg_index      = 4
       key_pair      = "kips_key"
       flavor_id     = "was"
-      block_device = {
-        image_id              = "linux"
+      block_device = [{
+        image_type            = "linux"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
         volume_size           = 50
         delete_on_termination = true
-    } },
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 500
+          delete_on_termination = true
+    }] },
     {
       instance_name = "map_dev_db_vm"
       nic_name      = "map_dev_db_nic"
@@ -319,12 +359,20 @@ variable "instances" {
       sg_index      = 4
       key_pair      = "kips_key"
       flavor_id     = "db"
-      block_device = {
-        image_id              = "mariadb"
+      block_device = [{
+        image_type            = "mariadb"
         source_type           = "image"
         destination_type      = "volume"
         boot_index            = 0
         volume_size           = 50
         delete_on_termination = true
-  } }]
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 500
+          delete_on_termination = true
+  }] }]
 }
