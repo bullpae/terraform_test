@@ -315,7 +315,7 @@ variable "instances" {
           source_type           = "blank"
           destination_type      = "volume"
           boot_index            = 1
-          volume_size           = 100
+          volume_size           = 50
           delete_on_termination = true
     }] },
     {
@@ -338,7 +338,7 @@ variable "instances" {
           source_type           = "blank"
           destination_type      = "volume"
           boot_index            = 1
-          volume_size           = 500
+          volume_size           = 450
           delete_on_termination = true
     }] },
     {
@@ -361,7 +361,7 @@ variable "instances" {
           source_type           = "blank"
           destination_type      = "volume"
           boot_index            = 1
-          volume_size           = 500
+          volume_size           = 450
           delete_on_termination = true
     }] },
     {
@@ -384,7 +384,7 @@ variable "instances" {
           source_type           = "blank"
           destination_type      = "volume"
           boot_index            = 1
-          volume_size           = 500
+          volume_size           = 450
           delete_on_termination = true
     }] },
     {
@@ -407,7 +407,7 @@ variable "instances" {
           source_type           = "blank"
           destination_type      = "volume"
           boot_index            = 1
-          volume_size           = 500
+          volume_size           = 450
           delete_on_termination = true
     }] } #,
     # {
