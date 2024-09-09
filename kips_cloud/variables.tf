@@ -237,7 +237,7 @@ variable "sg_sg_rules" {
           to_port     = "443"
           protocol    = "tcp"
           cidr_blocks = "0.0.0.0/0"
-      },
+        },
         {
           name        = "ssh "
           description = "ssh"
@@ -251,6 +251,7 @@ variable "sg_sg_rules" {
   }]
 }
 
+## 아주 중요!!!! Instance를 추가할 때 list 맨 마지막에 추가해야 함!! 중간이 끼워 넣으면 순서 바뀌어서 다 새로 만들어짐!!
 variable "instances" {
   description = "instance information"
   type = list(object({
@@ -293,29 +294,6 @@ variable "instances" {
         boot_index            = 1
         volume_size           = 50
         delete_on_termination = true
-    }] },
-    {
-      instance_name = "waf_vm"
-      nic_name      = "waf_nic"
-      subnet_index  = 0
-      sg_index      = 5 # waf-sg index 다른 sg와 헷갈리지 않게 주의 필요! 인덱시가 아닌 시안성 좋게 변경 필요!
-      key_pair      = "koiia_msp_key"
-      flavor_id     = "waf"
-      block_device = [{
-        image_type            = "penta_waf"
-        source_type           = "image"
-        destination_type      = "volume"
-        boot_index            = 0
-        volume_size           = 200
-        delete_on_termination = true
-        },
-        {
-          image_type            = ""
-          source_type           = "blank"
-          destination_type      = "volume"
-          boot_index            = 1
-          volume_size           = 1000
-          delete_on_termination = true
     }] },
     {
       instance_name = "analysis_test_web_vm"
@@ -431,5 +409,29 @@ variable "instances" {
           boot_index            = 1
           volume_size           = 500
           delete_on_termination = true
-  }] }]
+    }] } #,
+    # {
+    #   instance_name = "waf_vm"
+    #   nic_name      = "waf_nic"
+    #   subnet_index  = 0
+    #   sg_index      = 5 # waf-sg index 다른 sg와 헷갈리지 않게 주의 필요! 인덱시가 아닌 시안성 좋게 변경 필요!
+    #   key_pair      = "koiia_msp_key"
+    #   flavor_id     = "waf"
+    #   block_device = [{
+    #     image_type            = "penta_waf"
+    #     source_type           = "image"
+    #     destination_type      = "volume"
+    #     boot_index            = 0
+    #     volume_size           = 200
+    #     delete_on_termination = true
+    #     },
+    #     {
+    #       image_type            = ""
+    #       source_type           = "blank"
+    #       destination_type      = "volume"
+    #       boot_index            = 1
+    #       volume_size           = 1000
+    #       delete_on_termination = true
+    # }] }
+  ]
 }
