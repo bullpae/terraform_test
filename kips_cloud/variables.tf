@@ -287,7 +287,7 @@ variable "instances" {
       instance_name = "waf_vm"
       nic_name      = "waf_nic"
       subnet_index  = 0
-      sg_index      = 0
+      sg_index      = 5
       key_pair      = "koiia_msp_key"
       flavor_id     = "waf"
       block_device = [{
