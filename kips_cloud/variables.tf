@@ -237,6 +237,16 @@ variable "sg_sg_rules" {
           to_port     = "443"
           protocol    = "tcp"
           cidr_blocks = "0.0.0.0/0"
+      },
+        {
+          name        = "ssh "
+          description = "ssh"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "22"
+          to_port     = "22"
+          protocol    = "tcp"
+          cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
       }]
   }]
 }
@@ -250,6 +260,7 @@ variable "instances" {
     sg_index      = number # web-sg=0, was-sg=1, db-sg=2, test-sg=3, dev-sg=4, waf-sg=5
     key_pair      = string
     flavor_id     = string
+    # availability_zone = string # todo : 가용성 영역 선택으로 block storage를 따로 붙일 때 필요!!
     block_device = list(object({
       image_type            = string
       source_type           = string
@@ -287,7 +298,7 @@ variable "instances" {
       instance_name = "waf_vm"
       nic_name      = "waf_nic"
       subnet_index  = 0
-      sg_index      = 5
+      sg_index      = 5 # waf-sg index 다른 sg와 헷갈리지 않게 주의 필요! 인덱시가 아닌 시안성 좋게 변경 필요!
       key_pair      = "koiia_msp_key"
       flavor_id     = "waf"
       block_device = [{
