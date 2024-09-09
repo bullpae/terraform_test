@@ -23,6 +23,7 @@ resource "nhncloud_compute_instance_v2" "instance" {
     block_device {
         uuid = ( var.block_device[0].image_type == "linux" ? data.nhncloud_images_image_v2.linux.id : 
           var.block_device[0].image_type == "mariadb" ? data.nhncloud_images_image_v2.linux_db.id : 
+          var.block_device[0].image_type == "penta_waf" ? data.nhncloud_images_image_v2.penta_waf.id : 
           null
         )
         #uuid                  = var.image_id

@@ -17,8 +17,16 @@ data "nhncloud_images_image_v2" "linux_db" {
   most_recent = true
 }
 
+# WEB Application Firewall Image
+# PENTA WAF 6.0.6 : PentaSecurity WAPPLES SA 6.0.6 (2024.04.15)
+# PLOS WAF 4.0.6.61.28 : PIOLINK WEBFRONT-KS 4.0.6.61.28 (2023.04.25)
+data "nhncloud_images_image_v2" "penta_waf" {
+  name        = "PentaSecurity WAPPLES SA 6.0.6 (2024.04.15)"
+  most_recent = true
+}
+
 variable "image" {
   description = "vm image"
   type        = list(string)
-  default     = ["linux", "mariadb"]
+  default     = ["linux", "mariadb", "penta_waf"]
 }

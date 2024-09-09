@@ -215,6 +215,29 @@ variable "sg_sg_rules" {
           protocol    = "tcp"
           cidr_blocks = "10.1.10.0/24" # web-subnet 허용 (bastion)
       }]
+    },
+    {
+      sg_name = "waf-sg"
+      sg_rules = [{
+        name        = "http"
+        description = "http"
+        ethertype   = "IPv4"
+        direction   = "ingress"
+        from_port   = "80"
+        to_port     = "80"
+        protocol    = "tcp"
+        cidr_blocks = "0.0.0.0/0"
+        },
+        {
+          name        = "https"
+          description = "https"
+          ethertype   = "IPv4"
+          direction   = "ingress"
+          from_port   = "443"
+          to_port     = "443"
+          protocol    = "tcp"
+          cidr_blocks = "0.0.0.0/0"
+      }]
   }]
 }
 
@@ -223,8 +246,8 @@ variable "instances" {
   type = list(object({
     instance_name = string
     nic_name      = string
-    subnet_index  = number # web=0, was=1, db=2, test=3, dev=4 ## was 추가 시 index 주의!!
-    sg_index      = number # web-sg=0, was-sg=1, db-sg=2, test-sg=3, dev-sg=4
+    subnet_index  = number # web=0, was=1, db=2, test=3, dev=4 
+    sg_index      = number # web-sg=0, was-sg=1, db-sg=2, test-sg=3, dev-sg=4, waf-sg=5
     key_pair      = string
     flavor_id     = string
     block_device = list(object({
@@ -259,6 +282,29 @@ variable "instances" {
         boot_index            = 1
         volume_size           = 50
         delete_on_termination = true
+    }] },
+    {
+      instance_name = "waf_vm"
+      nic_name      = "waf_nic"
+      subnet_index  = 0
+      sg_index      = 0
+      key_pair      = "koiia_msp_key"
+      flavor_id     = "waf"
+      block_device = [{
+        image_type            = "penta_waf"
+        source_type           = "image"
+        destination_type      = "volume"
+        boot_index            = 0
+        volume_size           = 200
+        delete_on_termination = true
+        },
+        {
+          image_type            = ""
+          source_type           = "blank"
+          destination_type      = "volume"
+          boot_index            = 1
+          volume_size           = 1000
+          delete_on_termination = true
     }] },
     {
       instance_name = "analysis_test_web_vm"

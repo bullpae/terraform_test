@@ -72,6 +72,7 @@ module "instance" {
     var.instances[count.index].flavor_id == "web" ? data.nhncloud_compute_flavor_v2.web_flavor.id :
     var.instances[count.index].flavor_id == "was" ? data.nhncloud_compute_flavor_v2.was_flavor.id :
     var.instances[count.index].flavor_id == "db" ? data.nhncloud_compute_flavor_v2.db_flavor.id :
+    var.instances[count.index].flavor_id == "waf" ? data.nhncloud_compute_flavor_v2.db_flavor.id :
     null
   )
 
@@ -116,13 +117,13 @@ module "instance" {
 
 
 # 공인 IP 할당 (internet gateway 가 연결된 VPC에만 할당 가능!! 현재는 VPC Default Network만 자동 가능!!)
-resource "nhncloud_networking_floatingip_v2" "web_fip" {
-  pool = "Public Network"
-}
+# resource "nhncloud_networking_floatingip_v2" "web_fip" {
+#   pool = "Public Network"
+# }
 
-resource "nhncloud_networking_floatingip_v2" "bastion_fip" {
-  pool = "Public Network"
-}
+# resource "nhncloud_networking_floatingip_v2" "bastion_fip" {
+#   pool = "Public Network"
+# }
 
 # # 공인 IP 할당
 # resource "nhncloud_networking_floatingip_associate_v2" "devops-fip_associate" {
